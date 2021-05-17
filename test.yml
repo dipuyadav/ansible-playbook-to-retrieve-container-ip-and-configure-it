@@ -1,0 +1,19 @@
+- hosts: localhost
+  tasks:
+  - name: Get infos on container
+    docker_container_info:
+     name: os4
+    register: result
+  - debug:
+          #var: result
+
+          var: result.container.NetworkSettings.IPAddress
+          var: result['container']['NetworkSettings']['IPAddress']
+          #  - lineinfile:
+          #     path: /root/ip.txt
+          #     regex: '[myweb]'
+          #     insertafter: "[myweb]"
+          #     state: absent
+          #     firstmatch: yes
+     #     line: test line added
+     

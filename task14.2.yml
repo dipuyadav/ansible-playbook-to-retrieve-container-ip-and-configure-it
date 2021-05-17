@@ -1,0 +1,50 @@
+- hosts: localhost
+  vars_prompt:
+  - name: username
+    prompt: What is your docker os name ?
+    private: no
+  tasks:
+  - name: Add docker repository
+    yum_repository:
+     name: docker
+     description: this is docker repo
+     baseurl: https://download.docker.com/linux/centos/7/x86_64/test/
+     gpgcheck: no
+  - name: installing the docker
+    command:  "yum install docker-ce --nobest -y"
+  - name: start and enable the docker services
+    service:
+     name: docker
+     state: started
+     enabled: yes
+  - name: installing pythonn2
+    yum:
+     name: "python2"
+     state: present
+  - name: installing some required libraries
+    pip:
+      name: docker-py
+  - name: pulling docker image
+    docker_image:
+     name: dipukadocker/centos_ssh:v1
+     source: pull
+  - docker_container:
+     name: "{{ username }}"
+     image: dipukadocker/centos_ssh:v1
+     detach: yes
+  - name: Get infos on container
+    docker_container_info:
+      name: "{{ username }}"
+    register: result
+  - debug:
+          var: result.container.NetworkSettings.IPAddress
+
+  - template:
+          src: /task14.2/ip_docker.txt
+          dest: /root/ip_docker.txt
+- hosts: all
+  tasks:
+  - package:
+           name: httpd
+  - command: "/usr/sbin/httpd"
+
